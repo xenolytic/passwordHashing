@@ -3,7 +3,6 @@
 
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -11,30 +10,37 @@
     <form action="login.php" method="post">
         <label for="email">Email:</label>
         <input type="email" name="email" required>
+        <br>
         <label for="password">Password:</label>
         <input type="password" name="password" required>
-        <input type="submit" name="login" value="Login">
+        <br>
+        <input type="submit" value="Login">
     </form>
+
+    <?php
+    // Controleer of het formulier is ingediend
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Inclusief database en user bestanden
+        include_once 'database.php';
+        include_once 'user.php';
+
+        // Maak een nieuwe database verbinding
+        $database = new Database();
+        $db = $database->getConnection();
+
+        // Maak een nieuwe gebruiker
+        $user = new User($db);
+        $user->email = $_POST['email'];
+        $user->password = $_POST['password'];
+
+        // Probeer de gebruiker in te loggen
+        if ($user->login()) {
+            echo "Login successful!";
+        } else {
+            echo "Login failed.";
+        }
+    }
+    ?>
 </body>
 
 </html>
-
-<?php
-include_once 'Database.php';
-include_once 'User.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
-    $database = new Database();
-    $db = $database->getConnection();
-
-    $user = new User($db);
-    $user->email = $_POST['email'];
-    $user->password = $_POST['password'];
-
-    if ($user->login()) {
-        echo "<div class='message'>Login successful!</div>";
-    } else {
-        echo "<div class='message'>Login failed.</div>";
-    }
-}
-?>
